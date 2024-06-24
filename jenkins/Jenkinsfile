@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    def app = docker.build("discount-api")
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                        def app = docker.build("discount-api")
+                        app.push("latest")
+                    }
+                }
+                sshPublisher(
+                    publishers: [sshPublisherDesc(
+                        configName: "my-ssh-server",
+                        transfers: [sshTransfer(
+                            sourceFiles: "api/Dockerfile",
+                            execCommand: "docker run -d -p 5000:5000 discount-api:latest"
+                        )],
+                        usePromotionTimestamp: false,
+                        useWorkspaceInPromotion: false
+                    )]
+                )
+            }
+        }
+    }
+}

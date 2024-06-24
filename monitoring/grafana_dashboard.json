@@ -1,0 +1,17 @@
+{
+    "dashboard": {
+      "panels": [
+        {
+          "type": "graph",
+          "title": "API Response Time",
+          "targets": [
+            {
+              "expr": "http_request_duration_seconds_sum / http_request_duration_seconds_count",
+              "legendFormat": "{{method}} {{status}}"
+            }
+          ]
+        }
+      ]
+    }
+  }
+  
